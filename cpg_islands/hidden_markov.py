@@ -6,54 +6,41 @@ For now, this is just a sample from a `ghmm tutorial`_.
 
 """
 
-from __future__ import print_function
+from __future__ import print_function, division
+import sys
 import ghmm
 from header import header
 
-# setting 0 for Heads and 1 for Tails as our Alphabet 
-sigma = ghmm.IntegerRange(0, 2)
+RAW_ALPHABET = ['A', 'C', 'G', 'T']
 
-# transition matrix: rows and columns means origin and destiny states
-transitions_probabilities = [
-    [0.9, 0.1], # 0: fair state
-    [0.1, 0.9], # 1: biased state
-]
+# initialize the alphabet
+alphabet = ghmm.Alphabet(RAW_ALPHABET)
 
-# emission matrix: rows and columns means states and symbols respectively
-emissions_probabilities = [
-    [0.5, 0.5], # 0: fair state emissions probabilities
-    [0.75, 0.25], # 1: biased state emissions probabilities
-]
+# use uniform probabilities for transitions, emissions, and initial
+# probabilities
+transition_probabilities = [[1 / len(
+            alphabet) for unused in xrange(
+            len(alphabet))] for unused in xrange(len(alphabet))]
+emissions_probabilities = transition_probabilities
+initial_probabilities = [1 / len(alphabet) for unused in xrange(len(alphabet))]
 
-# probability of initial states
-pi = [0.5, 0.5] # equal probabilities for 0 and 1
-
+# create the Hidden Markov Model
 hmm = ghmm.HMMFromMatrices(
-    sigma,
-    # you can model HMMs with others emission probability distributions
-    ghmm.DiscreteDistribution(sigma),    
-    transitions_probabilities,
+    alphabet,
+    ghmm.DiscreteDistribution(alphabet),
+    transition_probabilities,
     emissions_probabilities,
-    pi
-)
+    initial_probabilities
+    )
 
-print(header('Hidden Markov Model'))
+# print the initial model
+print(header('Initial HMM'))
 print(hmm)
-print()
 
-tosses = [1, 1, 1, 0, 1, 0, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 1, 0, 1, 0,
-          1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 1]
+# learn from an emission sequence
+emission_sequence = ghmm.EmissionSequence(alphabet, ['G', 'G', 'A', 'T'])
+hmm.baumWelch(emission_sequence)
 
-# not as pythonic is could be :-/
-sequence = ghmm.EmissionSequence(sigma, tosses)
-
-viterbi_path, _ = hmm.viterbi(sequence)
-
-print(header('Viterbi Path'))
-print(viterbi_path)
-print()
-
-states_probabilities = hmm.posterior(sequence)
-
-print(header('State Probabilities'))
-print(states_probabilities)
+# print the revised model
+print(header('Learned HMM'))
+print(hmm)
