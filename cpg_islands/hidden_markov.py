@@ -1,8 +1,12 @@
-""":mod:`cpg_islands.hidden_markov` --- The actual model
+""":mod:`cpg_islands.finder` --- A CpG Island finder
 
-For now, this is just a sample from a `ghmm tutorial`_.
+This is based heavily on information and code from the following articles and
+tutorials:
 
-.. _ghmm tutorial: http://codecereal.blogspot.com/2011/05/hidden-markov-models.html
+* `HMM and GHMM Tutorial <http://codecereal.blogspot.com/2011/05/hidden-markov-models.html>`_
+* `BYU HMM Project <http://dna.cs.byu.edu/bio465/Labs/hmm.shtml>`_ and
+  `GHMM Tutorial <http://dna.cs.byu.edu/bio465/Labs/hmmtut.shtml>`_
+* `CpG Islands and HMM article <http://codecereal.blogspot.com/2011/06/cpg-islands-2.html>`_
 
 """
 
