@@ -22,15 +22,23 @@ def main(argv=None):
 {authors}
 URL: <{url}>
 '''.format(
-    title=metadata.nice_title,
-    version=metadata.version,
-    authors='\n'.join(author_strings),
-    url=metadata.url)
+        title=metadata.nice_title,
+        version=metadata.version,
+        authors='\n'.join(author_strings),
+        url=metadata.url
+    )
     
     arg_parser = argparse.ArgumentParser(
         formatter_class=argparse.RawDescriptionHelpFormatter,
         description=metadata.description,
-        epilog=epilog)
+        epilog=epilog
+        )
+    arg_parser.add_argument(
+        'learning_fasta',
+        metavar='LEARNING_FASTA',
+        type=argparse.FileType('r'),
+        help='FASTA format file from which to learn.'
+        )
 
     args = arg_parser.parse_args(args=argv[1:])
     
