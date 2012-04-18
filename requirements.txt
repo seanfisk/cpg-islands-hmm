@@ -1,6 +1,9 @@
 # documentation
 Sphinx
 
+# argument parsing (in standard library >= 2.7)
+argparse
+
 # must be installed manually <http://ghmm.org/>
 #ghmm
 

@@ -10,41 +10,54 @@ tutorials:
 
 """
 
-from __future__ import print_function, division
-import sys
 import ghmm
-from header import header
 
-RAW_ALPHABET = ['A', 'C', 'G', 'T']
+class CpGIslandFinder(object):
+    """Locates CpG islands in DNA sequences."""
+    def __init__(self):
+        """Initialize the Hidden Markov Model."""
+        # initialize the alphabet
+        # self.alphabet = ['A', 'C', 'G', 'T']    
+        self.alphabet = ghmm.DNA
+        
+        # transition matrix: rows and columns means origin and destiny states
+        # state 0: normal (not a CpG island)
+        # state 1: CpG island
+        self.transition_probabilities = [
+            # normal
+            # |
+            # |    island
+            # |    |
+            [0.9, 0.1], # normal
+            [0.3, 0.7], # island
+            ]
 
-# initialize the alphabet
-alphabet = ghmm.Alphabet(RAW_ALPHABET)
+        # emission probabilities
+        #               A    C    G    T
+        emit_normal = [.25, .15, .25, .35]
+        emit_island = [.25, .25, .25, .25]
+        self.emissions_probabilities = [emit_normal, emit_island]
+        
+        # initial probabilities (assume uniform)
+        self.initial_probabilities = [0.5] * 2
 
-# use uniform probabilities for transitions, emissions, and initial
-# probabilities
-transition_probabilities = [[1 / len(
-            alphabet) for unused in xrange(
-            len(alphabet))] for unused in xrange(len(alphabet))]
-emissions_probabilities = transition_probabilities
-initial_probabilities = [1 / len(alphabet) for unused in xrange(len(alphabet))]
+        # create the Hidden Markov Model
+        self.hmm = ghmm.HMMFromMatrices(
+            self.alphabet,
+            ghmm.DiscreteDistribution(self.alphabet),
+            self.transition_probabilities,
+            self.emissions_probabilities,
+            self.initial_probabilities
+            )
 
-# create the Hidden Markov Model
-hmm = ghmm.HMMFromMatrices(
-    alphabet,
-    ghmm.DiscreteDistribution(alphabet),
-    transition_probabilities,
-    emissions_probabilities,
-    initial_probabilities
-    )
+    def __str__(self):
+        return str(self.hmm)
 
-# print the initial model
-print(header('Initial HMM'))
-print(hmm)
+    def learn(self, sequence):
+        """Learn from another DNA sequence.
 
-# learn from an emission sequence
-emission_sequence = ghmm.EmissionSequence(alphabet, list('ACATTTGCTTCTGACACAACTGTGTTCACTAGCAACCTCAAACAGACACCATGGTGCATCTGACTCCTGAGGAGAAGTCTGCCGTTACTGCCCTGTGGGGCAAGGTGAACGTGGATGAAGTTGGTGGTGAGGCCCTGGGCAGGCTGCTGGTGGTCTACCCTTGGACCCAGAGGTTCTTTGAGTCCTTTGGGGATCTGTCCACTCCTGATGCTGTTATGGGCAACCCTAAGGTGAAGGCTCATGGCAAGAAAGTGCTCGGTGCCTTTAGTGATGGCCTGGCTCACCTGGACAACCTCAAGGGCACCTTTGCCACACTGAGTGAGCTGCACTGTGACAAGCTGCACGTGGATCCTGAGAACTTCAGGCTCCTGGGCAACGTGCTGGTCTGTGTGCTGGCCCATCACTTTGGCAAAGAATTCACCCCACCAGTGCAGGCTGCCTATCAGAAAGTGGTGGCTGGTGTGGCTAATGCCCTGGCCCACAAGTATCACTAAGCTCGCTTTCTTGCTGTCCAATTTCTATTAAAGGTTCCTTTGTTCCCTAAGTCCAACTACTAAACTGGGGGATATTATGAAGGGCCTTGAGCATCTGGATTCTGCCTAATAAAAAACATTTATTTTCATTGC'))
-hmm.baumWelch(emission_sequence)
-
-# print the revised model
-print(header('Learned HMM'))
-print(hmm)
+        :param sequence: the untagged DNA sequence
+        :type sequence: :class:`str`
+        """
+        emission_sequence = ghmm.EmissionSequence(self.alphabet, list(sequence))
+        self.hmm.baumWelch(emission_sequence)
