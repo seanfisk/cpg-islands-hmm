@@ -9,6 +9,14 @@ cpg_islands Package
     :undoc-members:
     :show-inheritance:
 
+:mod:`header` Module
+--------------------
+
+.. automodule:: cpg_islands.header
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 :mod:`hidden_markov` Module
 ---------------------------
 
